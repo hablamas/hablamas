@@ -2,199 +2,64 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Weller Store</title>
     <style>
-        :root {
-            --bg-color: #f2f2f7;
-            --card-bg: #ffffff;
-            --accent-color: #007aff;
-            --text-main: #1c1c1e;
-            --text-sub: #8e8e93;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-            margin: 0;
-            padding: env(safe-area-inset-top) 16px 120px;
-        }
-
-        /* Titre style One UI */
-        .header-area {
-            padding: 40px 8px 20px;
-        }
-
-        .header-area h1 {
-            font-size: 34px;
-            font-weight: 800;
-            margin: 0;
-        }
-
-        .header-area p {
-            color: var(--text-sub);
-            margin: 5px 0 0;
-            font-size: 17px;
-        }
-
-        /* Grille des pays */
-        .countries-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-            gap: 12px;
-        }
-
-        .country-card {
-            background: var(--card-bg);
-            border-radius: 28px; /* Squircle */
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
-            border: 2px solid transparent;
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
-            cursor: pointer;
-        }
-
-        /* Effet de rebond Samsung */
-        .country-card:active {
-            transform: scale(0.92);
-        }
-
-        .country-card.selected {
-            border-color: var(--accent-color);
-            background: #f0f7ff;
-        }
-
-        .flag-img {
-            width: 54px;
-            height: 54px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 12px;
-            background: #eee;
-        }
-
-        .country-name {
-            font-weight: 700;
-            font-size: 16px;
-            text-align: center;
-        }
-
-        .dial-code {
-            color: var(--text-sub);
-            font-size: 14px;
-            margin-top: 4px;
-        }
-
-        /* Bouton d'achat flottant */
-        #buy-button {
-            position: fixed;
-            bottom: 34px;
-            left: 16px;
-            right: 16px;
-            background-color: var(--accent-color);
-            color: white;
-            border: none;
-            height: 64px;
-            border-radius: 32px;
-            font-size: 18px;
-            font-weight: 700;
-            display: none; /* Masqué par défaut */
-            box-shadow: 0 12px 24px rgba(0, 122, 255, 0.3);
-            z-index: 1000;
-            cursor: pointer;
-            animation: slideIn 0.3s ease-out;
-        }
-
-        @keyframes slideIn {
-            from { transform: translateY(100px); opacity: 0; }
-            to { transform: translateY(0); opacity: 1; }
-        }
-
-        /* Loader */
-        .loader {
-            text-align: center;
-            padding: 50px;
-            color: var(--text-sub);
-        }
+        /* (Conserve tes styles One UI ici) */
+        body { background: #f2f2f7; font-family: sans-serif; padding: 20px; }
+        .countries-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+        .country-card { background: #fff; border-radius: 24px; padding: 16px; text-align: center; border: 2px solid transparent; }
+        .country-card.selected { border-color: #007aff; background: #eef6ff; }
+        #buy-button { position: fixed; bottom: 30px; left: 20px; right: 20px; padding: 18px; border-radius: 30px; background: #007aff; color: white; border: none; font-weight: bold; display: none; }
     </style>
 </head>
 <body>
 
-    <div class="header-area">
-        <h1>Weller Store</h1>
-        <p>Choisissez votre numéro international</p>
-    </div>
-
-    <div id="loader" class="loader">Chargement des pays...</div>
+    <h1>Weller Store</h1>
     <div class="countries-grid" id="grid"></div>
-
-    <button id="buy-button" onclick="startPurchase()">Acheter</button>
+    <button id="buy-button">Acheter</button>
 
     <script>
-        // Ton URL de Edge Function d'après ta capture
         const EDGE_URL = 'https://sulsvuumxkznprldxrmx.supabase.co/functions/v1/edge-test-';
-        let selectedCountry = null;
+        // REMPLACE CETTE CLÉ PAR TA CLÉ PUBLIQUE (ANON) SUPABASE
+        const SUPABASE_ANON_KEY = 'TA_CLE_PUBLIQUE_ANON_ICI';
 
-        async function initStore() {
+        async function loadCountries() {
             try {
-                const response = await fetch(EDGE_URL);
-                if (!response.ok) throw new Error('Erreur réseau');
-                const countries = await response.json();
+                const response = await fetch(EDGE_URL, {
+                    method: 'GET',
+                    headers: {
+                        'apikey': SUPABASE_ANON_KEY,
+                        'Authorization': `Bearer ${SUPABASE_ANON_KEY}`,
+                        'Content-Type': 'application/json'
+                    }
+                });
                 
-                document.getElementById('loader').style.display = 'none';
-                renderCountries(countries);
-            } catch (error) {
-                document.getElementById('loader').innerText = "Erreur de chargement";
-                console.error(error);
+                if (!response.ok) throw new Error('Erreur de connexion');
+                const data = await response.json();
+                render(data);
+            } catch (err) {
+                console.error(err);
+                alert("Erreur: Vérifie la console (F12) pour voir si c'est un blocage CORS.");
             }
         }
 
-        function renderCountries(list) {
+        function render(list) {
             const grid = document.getElementById('grid');
             list.forEach(c => {
                 const card = document.createElement('div');
                 card.className = 'country-card';
-                card.innerHTML = `
-                    <img src="${c.flag_url}" class="flag-img" alt="${c.country_name}">
-                    <div class="country-name">${c.country_name}</div>
-                    <div class="dial-code">${c.dial_code}</div>
-                `;
-                
-                card.onclick = () => selectItem(card, c);
+                card.innerHTML = `<img src="${c.flag_url}" width="40"><br>${c.country_name}<br><small>${c.dial_code}</small>`;
+                card.onclick = () => {
+                    document.querySelectorAll('.country-card').forEach(e => e.classList.remove('selected'));
+                    card.classList.add('selected');
+                    document.getElementById('buy-button').style.display = 'block';
+                };
                 grid.appendChild(card);
             });
         }
 
-        function selectItem(element, data) {
-            // Nettoyage des sélections précédentes
-            document.querySelectorAll('.country-card').forEach(el => el.classList.remove('selected'));
-            
-            // Appliquer la nouvelle sélection
-            element.classList.add('selected');
-            selectedCountry = data;
-
-            // Afficher le bouton avec le prix ou l'info
-            const btn = document.getElementById('buy-button');
-            btn.style.display = 'block';
-            btn.innerText = `Acheter le numéro ${data.dial_code}`;
-
-            // Haptic feedback (vibration)
-            if (window.navigator.vibrate) window.navigator.vibrate(10);
-        }
-
-        function startPurchase() {
-            if (!selectedCountry) return;
-            alert(`Préparation de l'achat pour : ${selectedCountry.country_name}`);
-            // Ici tu pourras rediriger vers ta logique de paiement
-        }
-
-        // Lancement
-        initStore();
+        loadCountries();
     </script>
 </body>
 </html>
